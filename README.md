@@ -1,1 +1,1 @@
-# secure-rag-knowledgebase-dotnet
+# Secure RAG Knowledge Base .NET
