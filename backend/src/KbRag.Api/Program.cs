@@ -2,21 +2,29 @@ using Qdrant.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add service defaults from Aspire
+
 builder.AddServiceDefaults();
 
-// Add Qdrant client with connection name matching the AppHost resource name
-// The connection string and settings are automatically injected by Aspire
 builder.AddQdrantClient("qdrant");
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3010")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 
 var app = builder.Build();
-
-// Map health check endpoint
+app.UseCors();
+app.MapDefaultEndpoints();
 app.MapGet("/health", () => Results.Ok(new
 {
     Status = "Healthy",
     Timestamp = DateTime.UtcNow,
     Service = "KbRag.Api"
 }));
-
 app.Run();
