@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\KbRag.Core\KbRag.Core.csproj" />
+    <ProjectReference Include="..\KbRag.Infrastructure\KbRag.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\aspire\KbRag.Aspire.ServiceDefaults\KbRag.Aspire.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Qdrant.Client" Version="13.1.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>

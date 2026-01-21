@@ -1,0 +1,19 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\backend\src\KbRag.Api\KbRag.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Qdrant" Version="13.1.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>0d808ff3-c64c-4c17-9850-a8aec8ff3bbf</UserSecretsId>
+  </PropertyGroup>
+
+</Project>

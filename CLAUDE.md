@@ -22,6 +22,15 @@ This is a **Secure RAG (Retrieval-Augmented Generation) Knowledge Base** built w
 - **Orchestration:** .NET Aspire 13.1 for distributed application management
 - **Storage:** Local disk (VPS hosting)
 
+## Project Conventions
+
+- All .NET project names MUST use the `KbRag` prefix (e.g., `KbRag.Aspire.AppHost`, `KbRag.Api`)
+- All class library projects follow the pattern `KbRag.<Layer>` (e.g., `KbRag.Core`, `KbRag.Infrastructure`)
+- Test projects use the suffix `.Tests` (e.g., `KbRag.Core.Tests`, `KbRag.Api.Tests`)
+- Solution file is named `KbRag.sln` at the root level
+- Frontend projects use kebab-case without prefix (e.g., `kb-rag-frontend`)
+- Docker containers and services use kebab-case naming (e.g., `qdrant-vector-store`, `aspire-dashboard`)
+
 ## Architecture Pattern
 
 The application follows a RAG (Retrieval-Augmented Generation) flow:
@@ -83,8 +92,32 @@ dotnet test
 # Run specific test
 dotnet test --filter "FullyQualifiedName~TestClassName"
 ```
+
+## Verification Rules
+
+**CRITICAL:** After any changes to `backend/` or `aspire/` projects, you MUST run Aspire to verify the application starts correctly:
+
+```bash
+# Always run this after backend/aspire changes
+dotnet run --project aspire/KbRag.Aspire.AppHost/KbRag.Aspire.AppHost.csproj
 ```
-├── aspire/                   # Aspire orchestration/  
+
+**Verification checklist:**
+- ✅ Build succeeds with no warnings or errors
+- ✅ Aspire AppHost starts successfully
+- ✅ Dashboard is accessible (shows URL in output)
+- ✅ No runtime exceptions in the output logs
+- ✅ Stop the process with Ctrl+C after verification
+
+**When to skip verification:**
+- Only changing test files
+- Only changing documentation
+- Trivial formatting changes (e.g., whitespace)
+
+### Project Structure
+
+```
+├── aspire/                   # Aspire orchestration/
 ├   ├── Aspire.AppHost/          # Aspire orchestration
 ├   ├── Aspire.ServiceDefaults/  # Aspire service defaults
 ├── frontend/                # Next.js application
