@@ -193,6 +193,64 @@ When implemented:
 - **CLAUDE.md:** This file (guidance for Claude Code)
 - **.docs/project** Project documentation
 
+### Documentation Structure Convention
+
+This project uses a structured documentation approach to track task progress and context across development sessions.
+
+```
+.docs/
+└── project/
+    └── tasks/
+        └── [task-name]/
+            ├── [task-name].md           # Task description/design
+            ├── progress.md              # Phase progress tracking
+            └── summary.md               # Session summaries
+```
+
+#### File Types
+
+**1. Task Description (`[task-name].md`)**
+- Design document or task specification
+- Contains phases, requirements, and implementation details
+- Example: `.docs/project/tasks/chat-ui/ai-chat-interface-design.md`
+
+**2. Progress Tracking (`progress.md`)**
+- Tracks completion status of each phase
+- Tables showing task completion status
+- Test results and metrics
+- Blockers and known issues
+- Updated as phases are completed
+
+**3. Session Summary (`summary.md`)**
+- Updated after each work session on the task
+- Contains:
+  - What was done (list of implementations)
+  - Key decisions made with rationale
+  - Current state (build status, test results)
+  - File paths reference
+  - Technical debt / known issues
+  - Notes for next agent
+
+#### When Working on Tasks
+
+1. **Before starting work:** Read the task description and latest summary files
+2. **During work:** Track progress in the progress.md file as you complete phases
+3. **After work:** Update summary.md with:
+   - Session date and agent info
+   - What was implemented
+   - Decisions made (with reasoning)
+   - Current state (build status, test results)
+   - File paths for all created/modified files
+   - Any blockers or issues encountered
+   - Next steps for the next agent
+
+#### Benefits
+
+- **Context Preservation:** Each agent understands what was done and why
+- **Decision Trail:** Rationale for key decisions is documented
+- **Continuity:** Work can resume across multiple sessions/agents seamlessly
+- **Traceability:** File paths and implementation details are readily accessible
+
 ## Available Specialized Agents
 
 This project includes specialized subagents located in `.claude/agents/` that can be invoked for specific tasks:
