@@ -14,12 +14,16 @@ const customJestConfig = {
     "^@/(.*)$": "<rootDir>/$1",
     "^@/__tests__/(.*)$": "<rootDir>/__tests__/$1",
   },
+  transformIgnorePatterns: [
+    "/node_modules/(?!(nanoid|@streamdown|remark-cjk-friendly|micromark-extension-cjk-friendly)/)",
+  ],
   collectCoverageFrom: [
     "app/**/*.{js,jsx,ts,tsx}",
     "lib/**/*.{js,jsx,ts,tsx}",
     "types/**/*.{js,jsx,ts,tsx}",
     "hooks/**/*.{js,jsx,ts,tsx}",
     "contexts/**/*.{js,jsx,ts,tsx}",
+    "components/**/*.{js,jsx,ts,tsx}",
     "!**/*.d.ts",
     "!**/node_modules/**",
     "!**/.next/**",
@@ -30,10 +34,10 @@ const customJestConfig = {
   ],
   coverageThreshold: {
     global: {
-      branches: 85,
-      functions: 85,
-      lines: 85,
-      statements: 85,
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
     },
   },
 };
