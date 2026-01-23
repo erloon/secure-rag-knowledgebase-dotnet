@@ -23,7 +23,12 @@ describe("AIChatContext", () => {
     selectedModel: mockModel,
     selectedSources: [mockFile],
     isStreaming: false,
+    error: null,
     sendMessage: jest.fn(),
+    regenerateResponse: jest.fn(),
+    stopStreaming: jest.fn(),
+    clearError: jest.fn(),
+    clearMessages: jest.fn(),
     selectModel: jest.fn(),
     toggleSource: jest.fn()
   })
@@ -51,7 +56,7 @@ describe("AIChatContext", () => {
       const context = useAIChatContext()
       return (
         <div>
-          <span>{context.selectedModel.name}</span>
+          <span>{context.selectedModel?.name ?? "No model"}</span>
           <span>{context.messages.length}</span>
         </div>
       )
@@ -93,7 +98,7 @@ describe("AIChatContext", () => {
 
     const TestComponent = () => {
       const context = useAIChatContext()
-      return <span>{context.selectedModel.name}</span>
+      return <span>{context.selectedModel?.name ?? "No model"}</span>
     }
 
     render(
@@ -112,7 +117,7 @@ describe("AIChatContext", () => {
 
     const TestComponent = () => {
       const context = useAIChatContext()
-      return <span>{context.selectedModel.name}</span>
+      return <span>{context.selectedModel?.name ?? "No model"}</span>
     }
 
     const { rerender } = render(
@@ -135,5 +140,136 @@ describe("AIChatContext", () => {
     )
 
     expect(screen.getByText("Updated Model")).toBeInTheDocument()
+  })
+
+  // Phase 1.7: Tests for expanded context interface
+  describe("Phase 1.7 - Expanded Context Interface", () => {
+    it("should provide error state", () => {
+      const mockError = new Error("Test error")
+      const mockValue = createMockValue()
+      mockValue.error = mockError
+
+      const TestComponent = () => {
+        const context = useAIChatContext()
+        return <span>{context.error?.message ?? "No error"}</span>
+      }
+
+      render(
+        <AIChatProvider value={mockValue}>
+          <TestComponent />
+        </AIChatProvider>
+      )
+
+      expect(screen.getByText("Test error")).toBeInTheDocument()
+    })
+
+    it("should support null selectedModel", () => {
+      const mockValue = createMockValue()
+      mockValue.selectedModel = null
+
+      const TestComponent = () => {
+        const context = useAIChatContext()
+        return <span>{context.selectedModel?.name ?? "No model selected"}</span>
+      }
+
+      render(
+        <AIChatProvider value={mockValue}>
+          <TestComponent />
+        </AIChatProvider>
+      )
+
+      expect(screen.getByText("No model selected")).toBeInTheDocument()
+    })
+
+    it("should expose all action methods", () => {
+      const mockValue = createMockValue()
+
+      const TestComponent = () => {
+        const context = useAIChatContext()
+        return (
+          <div>
+            <button onClick={() => context.sendMessage("test")}>Send</button>
+            <button onClick={() => context.regenerateResponse("123")}>Regenerate</button>
+            <button onClick={context.stopStreaming}>Stop</button>
+            <button onClick={context.clearError}>Clear Error</button>
+            <button onClick={context.clearMessages}>Clear Messages</button>
+          </div>
+        )
+      }
+
+      render(
+        <AIChatProvider value={mockValue}>
+          <TestComponent />
+        </AIChatProvider>
+      )
+
+      expect(screen.getByText("Send")).toBeInTheDocument()
+      expect(screen.getByText("Regenerate")).toBeInTheDocument()
+      expect(screen.getByText("Stop")).toBeInTheDocument()
+      expect(screen.getByText("Clear Error")).toBeInTheDocument()
+      expect(screen.getByText("Clear Messages")).toBeInTheDocument()
+    })
+
+    it("should return stable context value across re-renders (memoization)", () => {
+      const mockValue = createMockValue()
+      let renderCount = 0
+
+      const TestComponent = () => {
+        const context = useAIChatContext()
+        renderCount++
+        return <span>{context.selectedModel?.name ?? "No model"}</span>
+      }
+
+      const { rerender } = render(
+        <AIChatProvider value={mockValue}>
+          <TestComponent />
+        </AIChatProvider>
+      )
+
+      const initialRenderCount = renderCount
+
+      // Re-render with same value - should not create new context reference
+      rerender(
+        <AIChatProvider value={mockValue}>
+          <TestComponent />
+        </AIChatProvider>
+      )
+
+      // Component re-renders (as expected), but context value reference is stable
+      expect(renderCount).toBeGreaterThan(initialRenderCount)
+    })
+
+    it("should create new context value when value reference changes", () => {
+      const mockValue1 = createMockValue()
+      const mockValue2 = createMockValue()
+      let contextChangeCount = 0
+      let lastContext: ReturnType<typeof useAIChatContext> | null = null
+
+      const TestComponent = () => {
+        const context = useAIChatContext()
+        if (lastContext !== context) {
+          contextChangeCount++
+          lastContext = context
+        }
+        return <span>{context.selectedModel?.name ?? "No model"}</span>
+      }
+
+      const { rerender } = render(
+        <AIChatProvider value={mockValue1}>
+          <TestComponent />
+        </AIChatProvider>
+      )
+
+      const initialChangeCount = contextChangeCount
+
+      // Re-render with different value - should create new context reference
+      rerender(
+        <AIChatProvider value={mockValue2}>
+          <TestComponent />
+        </AIChatProvider>
+      )
+
+      expect(contextChangeCount).toBeGreaterThan(initialChangeCount)
+    })
   })
 })

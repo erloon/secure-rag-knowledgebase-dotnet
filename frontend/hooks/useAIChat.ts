@@ -1,6 +1,6 @@
 // hooks/useAIChat.ts
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import type {
   ChatMessage,
   AIModel,
@@ -51,6 +51,14 @@ export function useAIChat(params: UseAIChatParams): UseAIChatReturn {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+
+  // Track current messages without triggering re-renders
+  // Allows sendMessage to read messages at call time (defer-read pattern)
+  const messagesRef = useRef<ChatMessage[]>(messages)
+
+  useEffect(() => {
+    messagesRef.current = messages
+  }, [messages])
 
   // Process SSE stream
   const processStream = useCallback(
@@ -219,12 +227,15 @@ export function useAIChat(params: UseAIChatParams): UseAIChatReturn {
       const abortController = new AbortController()
       abortControllerRef.current = abortController
 
-      // Build payload
+      // Build payload - read messages from ref (defer-read pattern)
+      // This prevents the callback from being recreated on every message change
+      const currentMessages = messagesRef.current
+
       const payload: SendMessagePayload = {
         message: content,
         dataSources: selectedSources.map(s => s.id),
         model: selectedModel.id,
-        conversationHistory: messages,
+        conversationHistory: currentMessages,
         conversationId: undefined
       }
 
@@ -258,18 +269,21 @@ export function useAIChat(params: UseAIChatParams): UseAIChatReturn {
         )
       }
     },
-    [selectedModel, selectedSources, messages, handlers, processStream]
+    [selectedModel, selectedSources, handlers, processStream]  // messages removed from deps
   )
 
   // Regenerate a response
   const regenerateResponse = useCallback(
     async (messageId: string) => {
+      // Read current messages from ref (defer-read pattern)
+      const currentMessages = messagesRef.current
+
       // Find the message index
-      const messageIndex = messages.findIndex(m => m.id === messageId)
+      const messageIndex = currentMessages.findIndex(m => m.id === messageId)
       if (messageIndex === -1) return
 
       // Find the user message for this turn
-      const userMessage = messages[messageIndex - 1]
+      const userMessage = currentMessages[messageIndex - 1]
       if (!userMessage || userMessage.role !== "user") {
         handlers.onError(new Error("Cannot regenerate: user message not found"), "regenerateResponse")
         return
@@ -281,7 +295,7 @@ export function useAIChat(params: UseAIChatParams): UseAIChatReturn {
       // Resend the user message
       await sendMessage(userMessage.content)
     },
-    [messages, sendMessage, handlers]
+    [sendMessage, handlers]  // messages removed from deps
   )
 
   // Stop streaming
