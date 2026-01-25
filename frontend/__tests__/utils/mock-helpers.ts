@@ -221,7 +221,7 @@ export async function waitForState<T>(
   while (Date.now() - startTime < timeout) {
     try {
       const result = fn()
-      if (result !== undefined && result !== null) {
+      if (result) {
         return result
       }
     } catch {
@@ -259,10 +259,14 @@ export function createControlledStream(): {
  */
 export function mockCryptoUUID(): void {
   let uuidCounter = 0
-  global.crypto = {
-    ...global.crypto,
-    randomUUID: () => `test-uuid-${uuidCounter++}`
-  } as Crypto
+  Object.defineProperty(global, 'crypto', {
+    value: {
+      ...global.crypto,
+      randomUUID: () => `test-uuid-${uuidCounter++}`
+    },
+    writable: true,
+    configurable: true
+  })
 }
 
 /**

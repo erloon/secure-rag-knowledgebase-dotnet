@@ -29,7 +29,9 @@ describe("MessageAdapter", () => {
         content: "I'm doing well, thank you!"
       })
 
-      render(<MessageAdapter message={message} showActions={true} />)
+      // Need to provide onRegenerate for regenerate button to show
+      const mockRegenerate = jest.fn().mockResolvedValue(undefined)
+      render(<MessageAdapter message={message} showActions={true} onRegenerate={mockRegenerate} />)
 
       expect(screen.getByText("I'm doing well, thank you!")).toBeInTheDocument()
 
@@ -37,7 +39,7 @@ describe("MessageAdapter", () => {
       const copyButton = screen.getByRole("button", { name: /copy/i })
       expect(copyButton).toBeInTheDocument()
 
-      // Check for regenerate action button
+      // Check for regenerate action button (only shows when onRegenerate is provided)
       const regenerateButton = screen.getByRole("button", { name: /regenerate/i })
       expect(regenerateButton).toBeInTheDocument()
     })

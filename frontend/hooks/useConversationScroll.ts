@@ -36,16 +36,6 @@ export function useConversationScroll(
   // Threshold for considering "at bottom" (in pixels)
   const BOTTOM_THRESHOLD = 50
 
-  // Check if we're at the bottom
-  const checkIsAtBottom = useCallback(() => {
-    const element = scrollRef.current
-    if (!element) return true
-
-    const { scrollTop, scrollHeight, clientHeight } = element
-    const distanceFromBottom = scrollHeight - scrollTop - clientHeight
-    return distanceFromBottom <= BOTTOM_THRESHOLD
-  }, [scrollRef])
-
   // Scroll to bottom
   const scrollToBottom = useCallback(() => {
     const element = scrollRef.current
@@ -82,7 +72,9 @@ export function useConversationScroll(
     if (!element) return
 
     const handleScroll = () => {
-      setIsAtBottom(checkIsAtBottom())
+      const { scrollTop, scrollHeight, clientHeight } = element
+      const distanceFromBottom = scrollHeight - scrollTop - clientHeight
+      setIsAtBottom(distanceFromBottom <= BOTTOM_THRESHOLD)
     }
 
     // Initial check
@@ -95,7 +87,7 @@ export function useConversationScroll(
     return () => {
       element.removeEventListener("scroll", handleScroll)
     }
-  }, [scrollRef, checkIsAtBottom])
+  }, [scrollRef])
 
   // Auto-scroll when content changes (if enabled)
   useEffect(() => {

@@ -22,3 +22,9 @@ export type { DataSourceSelectorProps } from "./DataSourceSelector"
 
 export { ChatHeader } from "./ChatHeader"
 export type { ChatHeaderProps } from "./ChatHeader"
+
+export { ConversationContainer } from "./ConversationContainer"
+export type { ConversationContainerProps } from "./ConversationContainer"
+
+export { AIChatInterface } from "./AIChatInterface"
+export type { AIChatInterfaceProps } from "./AIChatInterface"

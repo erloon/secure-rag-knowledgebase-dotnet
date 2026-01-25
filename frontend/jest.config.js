@@ -15,7 +15,7 @@ const customJestConfig = {
     "^@/__tests__/(.*)$": "<rootDir>/__tests__/$1",
   },
   transformIgnorePatterns: [
-    "/node_modules/(?!(nanoid|@streamdown|remark-cjk-friendly|micromark-extension-cjk-friendly)/)",
+    "/node_modules/(?!(nanoid|nanoid/*|streamdown|streamdown/*|@streamdown|@streamdown/*|remark-cjk-friendly|remark-cjk-friendly-gfm-strikethrough|micromark-extension-cjk-friendly|unist-util-visit|rehype-harden|use-stick-to-bottom)/)",
   ],
   collectCoverageFrom: [
     "app/**/*.{js,jsx,ts,tsx}",

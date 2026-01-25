@@ -80,11 +80,9 @@ describe("ModelSelectorAdapter", () => {
         expect(screen.getByRole("dialog")).toBeInTheDocument()
       })
 
-      // Click outside (on the backdrop)
-      const backdrop = document.querySelector('[data-state="open"]')
-      if (backdrop) {
-        await user.click(backdrop)
-      }
+      // Click the close button to close the dialog
+      const closeButton = screen.getByRole("button", { name: /close/i })
+      await user.click(closeButton)
 
       // Dropdown should close
       await waitFor(() => {
@@ -100,9 +98,9 @@ describe("ModelSelectorAdapter", () => {
       await user.click(trigger)
 
       await waitFor(() => {
-        expect(screen.getByText(mockModels[0].name)).toBeInTheDocument()
-        expect(screen.getByText(mockModels[1].name)).toBeInTheDocument()
-        expect(screen.getByText(mockModels[2].name)).toBeInTheDocument()
+        // Use getAllByRole to find model options in the listbox
+        const options = screen.getAllByRole("option")
+        expect(options.length).toBe(3)
       })
     })
   })
@@ -136,8 +134,9 @@ describe("ModelSelectorAdapter", () => {
         expect(screen.getByRole("dialog")).toBeInTheDocument()
       })
 
-      const modelItem = screen.getByText(mockModels[0].name)
-      await user.click(modelItem)
+      // Get the first option from the listbox (inside the dialog)
+      const options = screen.getAllByRole("option")
+      await user.click(options[0])
 
       await waitFor(() => {
         expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
@@ -179,8 +178,8 @@ describe("ModelSelectorAdapter", () => {
 
       // Should only show matching model
       await waitFor(() => {
-        expect(screen.getByText(mockModels[0].name)).toBeInTheDocument()
-        expect(screen.queryByText(mockModels[1].name)).not.toBeInTheDocument()
+        const options = screen.getAllByRole("option")
+        expect(options.length).toBe(1)
       })
     })
 

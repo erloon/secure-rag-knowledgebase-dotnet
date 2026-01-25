@@ -101,11 +101,8 @@ describe("DataSourceSelector", () => {
         expect(screen.getByRole("dialog")).toBeInTheDocument()
       })
 
-      // Click overlay to close
-      const overlay = document.querySelector('[data-state="open"]')
-      if (overlay) {
-        await user.click(overlay as Element)
-      }
+      // Press Escape key to close dialog
+      await user.keyboard("{Escape}")
 
       await waitFor(() => {
         expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
@@ -205,8 +202,11 @@ describe("DataSourceSelector", () => {
         expect(screen.getByRole("dialog")).toBeInTheDocument()
       })
 
-      const checkbox = screen.getAllByRole("checkbox")[0]
-      await user.click(checkbox)
+      // Click the file row which contains the checkbox instead of checkbox directly
+      const fileRow = screen.getByText(mockFiles[0].filename).closest("[class*='flex']")
+      if (fileRow) {
+        await user.click(fileRow)
+      }
 
       expect(mockContextValue.toggleSource).toHaveBeenCalled()
     })
