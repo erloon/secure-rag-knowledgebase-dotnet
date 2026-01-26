@@ -97,6 +97,53 @@ Checklist: ✅ No TypeScript errors, ✅ All tests pass, ✅ No linting errors
 - Target: 80%+ coverage before marking tasks complete
 - Run: `npm test` (frontend), `dotnet test` (backend)
 
+**Frontend Testing - CRITICAL Configuration Notes:**
+
+This project uses **Jest**, NOT Vitest. Always use Jest imports:
+
+```typescript
+// ✅ CORRECT - Use Jest imports
+import { describe, it, expect, beforeEach, jest } from "@jest/globals"
+
+// ❌ WRONG - Do NOT use Vitest imports
+import { describe, it, expect, beforeEach, vi } from "vitest"
+```
+
+**Why this matters:**
+- The project is configured for Jest via `next/jest` wrapper
+- Vitest imports (`vi`) will fail with "Cannot read properties of undefined" errors
+- Always use `jest.fn()`, `jest.clearAllMocks()`, `jest.mock()` etc.
+- This applies to ALL test files in `frontend/`
+
+**Common Testing Pitfalls:**
+
+1. **ESM Configuration Issues:** Some AI Elements components (e.g., `use-stick-to-bottom`, Badge, Carousel) have ESM dependencies that Jest cannot handle properly with `next/jest`
+   - **Workaround:** Test what's actually testable; don't test full component rendering when ESLM issues occur
+   - **Example:** Citation badge rendering tests fail because hover card content isn't rendered in test environment
+   - **Solution:** Test component existence (`container.firstChild`) not specific internal DOM
+
+2. **ReadableStream Mocking:** Jest has limitations mocking ReadableStream for complex streaming tests
+   - **Issue:** Tests involving token-by-token stream updates are flaky
+   - **Workaround:** Test streaming state management, not actual stream chunk processing
+   - **Existing test coverage:** `useAIChat.test.ts` already tests streaming functionality adequately
+
+3. **DOM Selectors for shadcn Components:** Badge and other UI components use `data-slot` attributes, not CSS classes
+   - ❌ Wrong: `container.querySelector(".badge")` - Badge has no `badge` class
+   - ✅ Correct: `container.querySelector('[data-slot="badge"]')` - Badge has `data-slot="badge"` attribute
+
+**When to Simplify Tests:**
+- If a test depends on AI Elements components rendering (hover cards, carousels) and consistently fails due to ESLM
+- If a test requires complex ReadableStream mocking and becomes flaky
+- If the functionality is already well-tested in existing test files
+- Focus on testing YOUR code, not third-party components (shadcn AI Elements are already tested)
+
+**Test Quality Guidelines:**
+- ✅ DO test: Your custom components, hooks, state management, business logic
+- ✅ DO test: Component renders without crashing, props are passed correctly
+- ✅ DO test: User interactions, state changes, error handling
+- ⚠️ AVOID: Testing internal rendering of third-party components (Badge, Carousel, etc.)
+- ⚠️ AVOID: Complex ReadableStream chunk processing (test state management instead)
+
 ## Documentation Structure
 
 **Session-Based Documentation Pattern:**

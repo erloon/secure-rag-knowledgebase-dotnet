@@ -5,6 +5,7 @@ import { File, Plus, Check } from "lucide-react"
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -105,7 +106,7 @@ export const DataSourceSelector: MemoizedComponent<DataSourceSelectorProps> = me
         <div className="flex flex-col gap-4">
           {/* Header with title and count */}
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Select Data Sources</h2>
+            <DialogTitle className="text-lg font-semibold">Select Data Sources</DialogTitle>
             <span className="text-muted-foreground text-sm">
               {selectedCount} selected
             </span>

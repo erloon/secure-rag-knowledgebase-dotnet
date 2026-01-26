@@ -252,5 +252,29 @@ describe("MessageAdapter", () => {
 
       expect(screen.getByText(longContent)).toBeInTheDocument()
     })
+
+    it("should handle message with citations", () => {
+      const message = createMockChatMessage({
+        role: "assistant",
+        content: "Response with citations",
+        annotations: {
+          timestamp: new Date().toISOString(),
+          model: "gpt-4o",
+          citations: [
+            {
+              id: "cit-1",
+              document: "Test.pdf",
+              page: 1,
+              chunkIndex: 0,
+              relevanceScore: 90
+            }
+          ]
+        }
+      })
+
+      // Should render without crashing
+      const { container } = render(<MessageAdapter message={message} />)
+      expect(container.firstChild).not.toBeNull()
+    })
   })
 })

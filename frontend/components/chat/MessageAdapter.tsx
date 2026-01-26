@@ -10,6 +10,7 @@ import {
   MessageAction,
 } from "@/components/ai-elements/message"
 import { toAIElementMessage } from "@/lib/ai-element-adapters"
+import { InlineCitationAdapter } from "./InlineCitationAdapter"
 import type { ChatMessage } from "@/types/chat"
 import type { MemoizedComponent } from "@/types/components"
 
@@ -80,6 +81,13 @@ export const MessageAdapter: MemoizedComponent<MessageAdapterProps> = memo(funct
   // Only show for assistant messages with completed or error status
   const shouldShowActions = showActions && from === "assistant" && !isStreaming
 
+  // Determine if citations should be shown
+  // Only for assistant messages with citations
+  const hasCitations =
+    from === "assistant" &&
+    message.annotations?.citations &&
+    message.annotations.citations.length > 0
+
   return (
     <Message from={from}>
       <MessageContent>
@@ -91,6 +99,14 @@ export const MessageAdapter: MemoizedComponent<MessageAdapterProps> = memo(funct
         )}
         {!isStreaming && message.content && (
           <MessageResponse>{message.content}</MessageResponse>
+        )}
+        {hasCitations && !isStreaming && message.annotations?.citations && (
+          <div className="mt-2 inline-flex items-center gap-2">
+            <InlineCitationAdapter
+              citations={message.annotations.citations}
+              variant="default"
+            />
+          </div>
         )}
         {message.annotations?.reasoning && !isStreaming && (
           <details className="mt-2 group/details">
