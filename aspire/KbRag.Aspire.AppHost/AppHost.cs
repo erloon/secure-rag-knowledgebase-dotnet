@@ -6,7 +6,7 @@ var qdrant = builder.AddQdrant("qdrant")
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Persistent);
 
-var api = builder.AddProject<KbRag_Api>("kbrag-api")
+var api = builder.AddProject<KbRag_Api>("api")
     .WithReference(qdrant)
     .WaitFor(qdrant);
 

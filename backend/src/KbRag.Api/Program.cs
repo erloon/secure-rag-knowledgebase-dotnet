@@ -1,4 +1,5 @@
-using Qdrant.Client;
+using FluentValidation;
+using KbRag.Core.Ingestion.FileValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.AddQdrantClient("qdrant");
+builder.Services.AddProblemDetails();
+builder.Services.AddValidatorsFromAssemblyContaining<FileUploadValidator>();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
@@ -19,6 +22,10 @@ builder.Services.AddCors(options =>
 
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
+
 app.UseCors();
 app.MapDefaultEndpoints();
 app.MapGet("/health", () => Results.Ok(new
